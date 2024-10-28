@@ -7,8 +7,11 @@ const PORT = 3000;
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    const data = run()
+app.get('/', async (req, res) => {
+    const data = JSON.parse(await run()).response
+    console.log(data)
+    
+    
     res.send({code: 200, message: data});
 });
 

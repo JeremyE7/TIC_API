@@ -8,7 +8,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro-002",
-    systemInstruction: "Hola"
+    systemInstruction: "El json que envies solo debe contener el objeto response"
 });
 
 const generationConfig = {
@@ -26,8 +26,7 @@ export async function run() {
         ],
     });
 
-    const result = await chatSession.sendMessage("Cual es tu funcionalidad?")
-    console.log(result.response.text())
+    const result = await chatSession.sendMessage("Sabes donde queda la universidad Nacional de Loja?")
     
     return(result.response.text())
 }
