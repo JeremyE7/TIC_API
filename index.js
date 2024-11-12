@@ -28,6 +28,8 @@ const chatSession = model.startChat({
 
 export async function run(text) {
     try{
+        console.log(text);
+        
         const result = await chatSession.sendMessage(text)
         return(result.response.text())
     }catch(e){

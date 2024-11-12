@@ -9,9 +9,24 @@ const PORT = 3000;
 app.use(express.json());
 app.use(rateLimiter);
 
-app.post('/', async (req, res) => {
-    console.log("adwdawd");
+app.use((req, res, next) => {
+    // Permitir solicitudes desde cualquier origen (puedes restringir esto si es necesario)
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Cambia '*' por un dominio específico si lo necesitas
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
+    // Si es una solicitud OPTIONS, responder inmediatamente
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    // Pasar al siguiente middleware
+    next();
+});
+
+app.put('/', async (req, res) => {
+    console.log("adwdawd", req);
+    if(!req.body.text) return res.send({code: 400, message: "Bad Request"});
     const data = JSON.parse(await run(req.body.text)).response
     console.log(data)
     
