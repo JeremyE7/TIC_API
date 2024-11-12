@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import dotenv from 'dotenv'
+import { instructions } from './instructions.js';
 
 dotenv.config()
 
@@ -8,7 +9,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro-002",
-    systemInstruction: "El json que envies solo debe contener el objeto response"
+    systemInstruction: instructions
 });
 
 const generationConfig = {
@@ -19,15 +20,19 @@ const generationConfig = {
     responseMimeType: "application/json",
 };
 
-export async function run() {
-    const chatSession = model.startChat({
-        generationConfig,
-        history: [
-        ],
-    });
+const chatSession = model.startChat({
+    generationConfig,
+    history: [
+    ],
+});
 
-    const result = await chatSession.sendMessage("Sabes donde queda la universidad Nacional de Loja?")
-    
-    return(result.response.text())
+export async function run(text) {
+    try{
+        const result = await chatSession.sendMessage(text)
+        return(result.response.text())
+    }catch(e){
+        console.error(e)
+        return(JSON.stringify({response: "Lo siento, no entendi la pregunta, puedes repetirla?"}))
+    }
 }
 

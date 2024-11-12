@@ -1,5 +1,5 @@
 // Definimos el tiempo de espera en milisegundos (10 segundos)
-const WAIT_TIME = 60 * 1000;
+const WAIT_TIME = 10 * 1000;
 
 // Diccionario para almacenar el tiempo de la última solicitud por usuario
 const requestTimestamps = {};

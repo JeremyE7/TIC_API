@@ -9,8 +9,10 @@ const PORT = 3000;
 app.use(express.json());
 app.use(rateLimiter);
 
-app.get('/', async (req, res) => {
-    const data = JSON.parse(await run()).response
+app.post('/', async (req, res) => {
+    console.log("adwdawd");
+    
+    const data = JSON.parse(await run(req.body.text)).response
     console.log(data)
     
     
