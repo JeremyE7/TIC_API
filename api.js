@@ -24,6 +24,17 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get("/:text", async (req, res) => {
+    const text = req.params.text;
+    console.log(text);
+    
+    if(!text) return res.send({code: 400, message: 'Falta la pregunta en la url xd'})
+    const data = JSON.parse(await run(text)).response
+    console.log(data)
+
+    res.send({code: 200, message: data})
+})
+
 app.put('/', async (req, res) => {
     console.log("adwdawd", req);
     if(!req.body.text) return res.send({code: 400, message: "Bad Request"});

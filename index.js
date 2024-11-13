@@ -8,7 +8,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro-002",
+    model: "gemini-1.5-flash",
     systemInstruction: instructions
 });
 
@@ -20,15 +20,15 @@ const generationConfig = {
     responseMimeType: "application/json",
 };
 
-const chatSession = model.startChat({
-    generationConfig,
-    history: [
-    ],
-});
 
 export async function run(text) {
     try{
         console.log(text);
+        const chatSession = model.startChat({
+            generationConfig,
+            history: [
+            ],
+        });
         
         const result = await chatSession.sendMessage(text)
         return(result.response.text())
