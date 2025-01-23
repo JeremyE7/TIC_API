@@ -1,40 +1,50 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
-import dotenv from 'dotenv'
-import { instructions } from './instructions.js';
+// app.js
+import express from 'express'
+import { run } from './api.js'
+import { rateLimiter } from './rateLimiterMiddleware.js';
 
-dotenv.config()
+const app = express();
+const PORT = 3000;
 
-const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey);
+app.use(express.json());
+app.use(rateLimiter);
 
-export async function run(text) {
+app.use((req, res, next) => {
+    // Permitir solicitudes desde cualquier origen (puedes restringir esto si es necesario)
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Cambia '*' por un dominio específico si lo necesitas
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
-    const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-        systemInstruction: instructions
-    });
-    
-    const generationConfig = {
-        temperature: 1,
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 8192,
-        responseMimeType: "application/json",
-    };
-
-    try{
-        console.log(text);
-        const chatSession = model.startChat({
-            generationConfig,
-            history: [
-            ],
-        });
-        
-        const result = await chatSession.sendMessage(text)
-        return(result.response.text())
-    }catch(e){
-        console.error(e)
-        return(JSON.stringify({response: "Lo siento, no entendi la pregunta, puedes repetirla?"}))
+    // Si es una solicitud OPTIONS, responder inmediatamente
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
-}
 
+    // Pasar al siguiente middleware
+    next();
+});
+
+app.get("/:text", async (req, res) => {
+    const text = req.params.text;
+    console.log(text);
+    
+    if(!text) return res.send({code: 400, message: 'Falta la pregunta en la url xd'})
+    const data = JSON.parse(await run(text)).response
+    console.log(data)
+
+    res.send({code: 200, message: data})
+})
+
+app.put('/', async (req, res) => {
+    console.log("adwdawd", req);
+    if(!req.body.text) return res.send({code: 400, message: "Bad Request"});
+    const data = JSON.parse(await run(req.body.text)).response
+    console.log(data)
+    
+    
+    res.send({code: 200, message: data});
+});
+
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);  
+});
